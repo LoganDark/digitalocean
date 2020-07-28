@@ -12,13 +12,13 @@ use digitalocean::prelude::*;
 use std::env;
 
 fn main() {
-    let api_key = env::var("API_KEY")
-        .expect("API_KEY not set.");
-    let client = DigitalOcean::new(api_key)
-        .unwrap();
+	let api_key = env::var("API_KEY")
+		.expect("API_KEY not set.");
+	let client = DigitalOcean::new(api_key)
+		.unwrap();
 
-    Droplet::list()
-        .execute(&client);
+	Droplet::list()
+		.execute(&client);
 }
 ```
 
@@ -36,16 +36,16 @@ use digitalocean::DigitalOcean;
 use digitalocean::api::Domain;
 
 fn main() {
-    // Gets details of a specific domain.
-    let req = Domain::get("foo.com");
+	// Gets details of a specific domain.
+	let req = Domain::get("foo.com");
 
-    // Get the records for that domain instead (futher build the request)
-    let req = req.records();
-    // Get the records of a domain without having a prior request.
-    let req = Domain::get("foo.com").records();
+	// Get the records for that domain instead (futher build the request)
+	let req = req.records();
+	// Get the records of a domain without having a prior request.
+	let req = Domain::get("foo.com").records();
 
-    // Create a new record for a domain
-    let req = Domain::get("foo.com").records().create("CNAME", "test", "127.0.0.1");
+	// Create a new record for a domain
+	let req = Domain::get("foo.com").records().create("CNAME", "test", "127.0.0.1");
 }
 ```
 
@@ -91,6 +91,7 @@ Please just open an issue or PR!
 
 use lazy_static::lazy_static;
 use log::info;
+
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
@@ -110,34 +111,31 @@ use crate::error::Error;
 use url::Url;
 
 const STATIC_URL_ERROR: &str = "Staticly constructed DigitalOcean URL is malformed.";
+
 lazy_static! {
-    static ref ROOT_URL: Url =
-        Url::parse("https://api.digitalocean.com/v2").expect(STATIC_URL_ERROR);
+	static ref ROOT_URL: Url =
+		Url::parse("https://api.digitalocean.com/v2").expect(STATIC_URL_ERROR);
 }
 
 /// A DigitalOcean Client that holds an API key.
 #[derive(Clone)]
 pub struct DigitalOcean {
-    client: client::Client,
-    token: String,
+	client: client::Client,
+	token: String
 }
 
 impl DigitalOcean {
-    /// Create a DigitalOcean client with the given API key.
-    pub fn new<T: Into<String>>(token: T) -> Result<Self, Error> {
-        info!("Created.");
-        Ok(DigitalOcean {
-            client: client::Client::new(),
-            token: token.into(),
-        })
-    }
+	/// Create a DigitalOcean client with the given API key.
+	pub fn new<T: Into<String>>(token: T) -> Result<Self, Error> {
+		info!("Created.");
+		Ok(DigitalOcean {
+			client: client::Client::new(),
+			token: token.into(),
+		})
+	}
 
-    pub fn execute<A, V>(&self, request: Request<A, V>) -> Result<V, Error>
-    where
-        A: Method,
-        Request<A, V>: Executable<V>,
-        V: HasResponse,
-    {
-        request.execute(self)
-    }
+	pub fn execute<A: Method, V: HasResponse>(&self, request: Request<A, V>) -> Result<V, Error>
+		where Request<A, V>: Executable<V> {
+		request.execute(self)
+	}
 }

@@ -9,54 +9,54 @@ use std::fmt::Display;
 const IMAGE_ACTIONS_SEGMENT: &str = "actions";
 
 impl ImageRequest<Get, Image> {
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-actions-for-an-image)
-    pub fn actions(mut self) -> ImageActionRequest<List, Vec<Action>> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(IMAGE_ACTIONS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-actions-for-an-image)
+	pub fn actions(mut self) -> ImageActionRequest<List, Vec<Action>> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(IMAGE_ACTIONS_SEGMENT);
 
-        self.transmute()
-    }
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#transfer-an-image)
-    pub fn transfer<S>(mut self, region: S) -> ImageActionRequest<Create, Action>
-    where
-        S: AsRef<str> + Display + Serialize,
-    {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(IMAGE_ACTIONS_SEGMENT);
+		self.transmute()
+	}
 
-        self.set_body(json!({
-            "type": "transfer",
-            "region": region,
-        }));
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#transfer-an-image)
+	pub fn transfer<S>(mut self, region: S) -> ImageActionRequest<Create, Action>
+		where S: AsRef<str> + Display + Serialize {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(IMAGE_ACTIONS_SEGMENT);
 
-        self.transmute()
-    }
+		self.set_body(json!({
+			"type": "transfer",
+			"region": region,
+		}));
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#convert-an-image-to-a-snapshot)
-    pub fn convert(mut self) -> ImageActionRequest<Create, Action> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(IMAGE_ACTIONS_SEGMENT);
+		self.transmute()
+	}
 
-        self.set_body(json!({
-            "type": "convert",
-        }));
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#convert-an-image-to-a-snapshot)
+	pub fn convert(mut self) -> ImageActionRequest<Create, Action> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(IMAGE_ACTIONS_SEGMENT);
 
-        self.transmute()
-    }
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-image-action)
-    pub fn action(mut self, id: usize) -> ImageActionRequest<Get, Action> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(IMAGE_ACTIONS_SEGMENT)
-            .push(&id.to_string());
+		self.set_body(json!({
+			"type": "convert",
+		}));
 
-        self.transmute()
-    }
+		self.transmute()
+	}
+
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-image-action)
+	pub fn action(mut self, id: usize) -> ImageActionRequest<Get, Action> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(IMAGE_ACTIONS_SEGMENT)
+			.push(&id.to_string());
+
+		self.transmute()
+	}
 }

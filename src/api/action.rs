@@ -27,91 +27,100 @@ const ACTIONS_SEGMENT: &str = "actions";
 #[derive(Deserialize, Serialize, Debug, Clone, Getters, Setters)]
 #[get = "pub"]
 pub struct Action {
-    /// A unique identifier for each Droplet action event. This is used to
-    /// reference a specific action that was requested.
-    id: usize,
-    /// The current status of the action. The value of this attribute will be
-    /// "in-progress", "completed", or "errored".
-    status: String,
-    /// The type of action that the event is executing (reboot, power_off,
-    /// etc.).
-    started_at: DateTime<Utc>,
-    /// A time value given in ISO8601 combined date and time format that
-    /// represents when the action was completed.
-    completed_at: Option<DateTime<Utc>>,
-    /// A unique identifier for the resource that the action is associated
-    /// with.
-    resource_id: usize,
-    /// The type of resource that the action is associated with.
-    resource_type: String,
-    // /// (deprecated) A slug representing the region where the action occurred.
-    // #[get = "pub"]
-    // #[deprecated(since = "0.0.1", note = "DigitalOcean has deprecated this.")]
-    // region: Option<Region>,
-    /// A slug representing the region where the action occurred.
-    region_slug: Option<String>,
+	/// A unique identifier for each Droplet action event. This is used to
+	/// reference a specific action that was requested.
+	id: usize,
+
+	/// The current status of the action. The value of this attribute will be
+	/// "in-progress", "completed", or "errored".
+	status: String,
+
+	/// The type of action that the event is executing (reboot, power_off,
+	/// etc.).
+	started_at: DateTime<Utc>,
+
+	/// A time value given in ISO8601 combined date and time format that
+	/// represents when the action was completed.
+	completed_at: Option<DateTime<Utc>>,
+
+	/// A unique identifier for the resource that the action is associated
+	/// with.
+	resource_id: usize,
+
+	/// The type of resource that the action is associated with.
+	resource_type: String,
+
+	// /// (deprecated) A slug representing the region where the action occurred.
+	// #[get = "pub"]
+	// #[deprecated(since = "0.0.1", note = "DigitalOcean has deprecated this.")]
+	// region: Option<Region>,
+	/// A slug representing the region where the action occurred.
+	region_slug: Option<String>
 }
 
 impl Action {
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-action)
-    pub fn get(id: usize) -> ActionRequest<Get, Action> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(ACTIONS_SEGMENT)
-            .push(&id.to_string());
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-action)
+	pub fn get(id: usize) -> ActionRequest<Get, Action> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(ACTIONS_SEGMENT)
+			.push(&id.to_string());
 
-        Request::new(url)
-    }
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-actions)
-    pub fn list() -> ActionRequest<List, Vec<Action>> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(ACTIONS_SEGMENT);
+		Request::new(url)
+	}
 
-        Request::new(url)
-    }
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-actions)
+	pub fn list() -> ActionRequest<List, Vec<Action>> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(ACTIONS_SEGMENT);
+
+		Request::new(url)
+	}
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ActionResponse {
-    action: Action,
+	action: Action
 }
 
 impl HasValue for ActionResponse {
-    type Value = Action;
-    fn value(self) -> Action {
-        self.action
-    }
+	type Value = Action;
+
+	fn value(self) -> Action {
+		self.action
+	}
 }
 
 impl HasResponse for Action {
-    type Response = ActionResponse;
+	type Response = ActionResponse;
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ActionListResponse {
-    actions: Vec<Action>,
-    links: ApiLinks,
-    meta: ApiMeta,
+	actions: Vec<Action>,
+	links: ApiLinks,
+	meta: ApiMeta
 }
 
 impl HasResponse for Vec<Action> {
-    type Response = ActionListResponse;
+	type Response = ActionListResponse;
 }
 
 impl HasPagination for ActionListResponse {
-    fn next_page(&self) -> Option<Url> {
-        self.links.next()
-    }
+	fn next_page(&self) -> Option<Url> {
+		self.links.next()
+	}
 }
 
 impl HasValue for ActionListResponse {
-    type Value = Vec<Action>;
-    fn value(self) -> Vec<Action> {
-        self.actions
-    }
+	type Value = Vec<Action>;
+
+	fn value(self) -> Vec<Action> {
+		self.actions
+	}
 }

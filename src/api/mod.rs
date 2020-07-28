@@ -47,56 +47,60 @@ pub const MAX_PER_PAGE: usize = 200;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 struct ApiLinks {
-    pages: Option<ApiPages>,
+	pages: Option<ApiPages>
 }
 
 impl ApiLinks {
-    fn next(&self) -> Option<Url> {
-        match self.pages {
-            Some(ref pages) => match pages.next {
-                Some(ref v) => Some(v.clone()),
-                None => None,
-            },
-            None => None,
-        }
-    }
+	fn next(&self) -> Option<Url> {
+		match self.pages {
+			Some(ref pages) => match pages.next {
+				Some(ref v) => Some(v.clone()),
+				None => None
+			},
+			None => None
+		}
+	}
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 struct ApiPages {
-    #[serde(with = "url_serde", default)]
-    prev: Option<Url>,
-    #[serde(with = "url_serde", default)]
-    first: Option<Url>,
-    #[serde(with = "url_serde", default)]
-    next: Option<Url>,
-    #[serde(with = "url_serde", default)]
-    last: Option<Url>,
+	#[serde(with = "url_serde", default)]
+	prev: Option<Url>,
+
+	#[serde(with = "url_serde", default)]
+	first: Option<Url>,
+
+	#[serde(with = "url_serde", default)]
+	next: Option<Url>,
+
+	#[serde(with = "url_serde", default)]
+	last: Option<Url>
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 struct ApiMeta {
-    total: usize,
+	total: usize
 }
 
 pub trait HasPagination {
-    fn next_page(&self) -> Option<Url>;
+	fn next_page(&self) -> Option<Url>;
 }
 
 pub trait HasValue {
-    type Value: DeserializeOwned;
-    fn value(self) -> Self::Value;
+	type Value: DeserializeOwned;
+	fn value(self) -> Self::Value;
 }
 
 impl HasValue for () {
-    type Value = ();
-    fn value(self) -> Self::Value {}
+	type Value = ();
+
+	fn value(self) -> Self::Value {}
 }
 
 pub trait HasResponse: DeserializeOwned + Clone {
-    type Response: DeserializeOwned + Clone + HasValue<Value = Self>;
+	type Response: DeserializeOwned + Clone + HasValue<Value=Self>;
 }
 
 impl HasResponse for () {
-    type Response = ();
+	type Response = ();
 }

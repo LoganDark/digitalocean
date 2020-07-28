@@ -32,474 +32,505 @@ const BACKUPS_SEGMENT: &str = "backups";
 #[derive(Deserialize, Serialize, Debug, Clone, Getters, Setters)]
 #[get = "pub"]
 pub struct Droplet {
-    /// A unique identifier for each Droplet instance. This is automatically
-    /// generated upon Droplet creation.
-    id: usize,
-    /// The human-readable name set for the Droplet instance.
-    name: String,
-    /// Memory of the Droplet in megabytes.
-    memory: usize,
-    /// The number of virtual CPUs.
-    vcpus: usize,
-    /// The size of the Droplet's disk in gigabytes.
-    disk: usize,
-    /// A boolean value indicating whether the Droplet has been locked,
+	/// A unique identifier for each Droplet instance. This is automatically
+	/// generated upon Droplet creation.
+	id: usize,
+
+	/// The human-readable name set for the Droplet instance.
+	name: String,
+
+	/// Memory of the Droplet in megabytes.
+	memory: usize,
+
+	/// The number of virtual CPUs.
+	vcpus: usize,
+
+	/// The size of the Droplet's disk in gigabytes.
+	disk: usize,
+
+	/// A boolean value indicating whether the Droplet has been locked,
     /// preventing actions by users.
-    locked: bool,
-    /// A time value given in ISO8601 combined date and time format that
+	locked: bool,
+
+	/// A time value given in ISO8601 combined date and time format that
     /// represents when the Droplet was created.
-    created_at: DateTime<Utc>,
-    /// A status string indicating the state of the Droplet instance. This may
+	created_at: DateTime<Utc>,
+
+	/// A status string indicating the state of the Droplet instance. This may
     /// be "new", "active", "off", or "archive".
-    status: String,
-    /// An array of backup IDs of any backups that have been taken of the
+	status: String,
+
+	/// An array of backup IDs of any backups that have been taken of the
     /// Droplet instance. Droplet backups are enabled at the time of the
     /// instance creation.
-    backup_ids: Vec<usize>,
-    /// An array of snapshot IDs of any snapshots created from the Droplet
+	backup_ids: Vec<usize>,
+
+	/// An array of snapshot IDs of any snapshots created from the Droplet
     /// instance.
-    snapshot_ids: Vec<usize>,
-    /// An array of features enabled on this Droplet.
-    features: Vec<String>,
-    /// The region that the Droplet instance is deployed in. When setting a
+	snapshot_ids: Vec<usize>,
+
+	/// An array of features enabled on this Droplet.
+	features: Vec<String>,
+
+	/// The region that the Droplet instance is deployed in. When setting a
     /// region, the value should be the slug identifier for the region. When
     /// you query a Droplet, the entire region object will be returned.
-    region: Region,
-    /// The base image used to create the Droplet instance. When setting an
+	region: Region,
+
+	/// The base image used to create the Droplet instance. When setting an
     /// image, the value is set to the image id or slug. When querying the
     /// Droplet, the entire image object will be returned.
-    image: Image,
-    /// The current size object describing the Droplet. When setting a size,
+	image: Image,
+
+	/// The current size object describing the Droplet. When setting a size,
     /// the value is set to the size slug. When querying the Droplet, the
     /// entire size object will be returned. Note that the disk volume of a
     /// Droplet may not match the size's disk due to Droplet resize actions.
     /// The disk attribute on the Droplet should always be referenced.
-    size: Size,
-    /// The unique slug identifier for the size of this Droplet.
-    size_slug: String,
-    /// The details of the network that are configured for the Droplet
+	size: Size,
+
+	/// The unique slug identifier for the size of this Droplet.
+	size_slug: String,
+
+	/// The details of the network that are configured for the Droplet
     /// instance. This is an object that contains keys for IPv4 and IPv6.
     /// The value of each of these is an array that contains objects describing
     /// an individual IP resource allocated to the Droplet. These will define
     /// attributes like the IP address, netmask, and gateway of the specific
     /// network depending on the type of network it is.
-    networks: Networks,
-    /// The current kernel. This will initially be set to the kernel of the
-    /// base image when the Droplet is created.
-    kernel: Option<Kernel>,
-    /// The details of the Droplet's backups feature, if backups are configured
-    /// for the Droplet. This object contains keys for the start and end times
-    /// of the window during which the backup will start.
-    next_backup_window: Option<NextBackupWindow>,
-    /// An array of Tags the Droplet has been tagged with.
-    tags: Vec<String>,
-    /// A flat array including the unique identifier for each Block Storage
-    /// volume attached to the Droplet.
-    volume_ids: Vec<String>,
+	networks: Networks,
+
+	/// The current kernel. This will initially be set to the kernel of the
+	/// base image when the Droplet is created.
+	kernel: Option<Kernel>,
+
+	/// The details of the Droplet's backups feature, if backups are configured
+	/// for the Droplet. This object contains keys for the start and end times
+	/// of the window during which the backup will start.
+	next_backup_window: Option<NextBackupWindow>,
+
+	/// An array of Tags the Droplet has been tagged with.
+	tags: Vec<String>,
+
+	/// A flat array including the unique identifier for each Block Storage
+	/// volume attached to the Droplet.
+	volume_ids: Vec<String>
 }
 
 /// Fields which exists inside Droplets.
 pub mod droplet_fields {
-    use chrono::{DateTime, Utc};
-    use std::net::{Ipv4Addr, Ipv6Addr};
-    /// This exists in the `networks` field of a droplet.
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    pub struct Networks {
-        pub v4: Vec<NetworkV4>,
-        pub v6: Vec<NetworkV6>,
-    }
+	use chrono::{DateTime, Utc};
+	use std::net::{Ipv4Addr, Ipv6Addr};
 
-    /// These exist in the `networks` field of a droplet.
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    pub struct NetworkV4 {
-        pub gateway: Ipv4Addr,
-        pub ip_address: Ipv4Addr,
-        pub netmask: Ipv4Addr,
-        /// *Note:* Since `type` is a keyword in Rust `kind` is used instead.
-        #[serde(rename = "type")]
-        pub kind: String,
-    }
+	/// This exists in the `networks` field of a droplet.
+	#[derive(Deserialize, Serialize, Debug, Clone)]
+	pub struct Networks {
+		pub v4: Vec<NetworkV4>,
+		pub v6: Vec<NetworkV6>
+	}
 
-    /// These exist in the `networks` field of a droplet.
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    pub struct NetworkV6 {
-        pub gateway: Ipv6Addr,
-        pub ip_address: Ipv6Addr,
-        pub netmask: usize,
-        /// *Note:* Since `type` is a keyword in Rust `kind` is used instead.
-        #[serde(rename = "type")]
-        pub kind: String,
-    }
+	/// These exist in the `networks` field of a droplet.
+	#[derive(Deserialize, Serialize, Debug, Clone)]
+	pub struct NetworkV4 {
+		pub gateway: Ipv4Addr,
+		pub ip_address: Ipv4Addr,
+		pub netmask: Ipv4Addr,
+		/// *Note:* Since `type` is a keyword in Rust `kind` is used instead.
+		#[serde(rename = "type")]
+		pub kind: String
+	}
 
-    /// This exists in the `next_backup_window` field of a droplet.
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    pub struct NextBackupWindow {
-        pub end: DateTime<Utc>,
-        pub start: DateTime<Utc>,
-    }
+	/// These exist in the `networks` field of a droplet.
+	#[derive(Deserialize, Serialize, Debug, Clone)]
+	pub struct NetworkV6 {
+		pub gateway: Ipv6Addr,
+		pub ip_address: Ipv6Addr,
+		pub netmask: usize,
+		/// *Note:* Since `type` is a keyword in Rust `kind` is used instead.
+		#[serde(rename = "type")]
+		pub kind: String
+	}
 
-    /// This exists in the `kernel` field of a droplet.
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    pub struct Kernel {
-        pub id: usize,
-        pub name: String,
-        pub version: String,
-    }
+	/// This exists in the `next_backup_window` field of a droplet.
+	#[derive(Deserialize, Serialize, Debug, Clone)]
+	pub struct NextBackupWindow {
+		pub end: DateTime<Utc>,
+		pub start: DateTime<Utc>
+	}
+
+	/// This exists in the `kernel` field of a droplet.
+	#[derive(Deserialize, Serialize, Debug, Clone)]
+	pub struct Kernel {
+		pub id: usize,
+		pub name: String,
+		pub version: String
+	}
 }
 
 impl Droplet {
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn create<S, D>(name: S, region: S, size: S, image: D) -> DropletRequest<Create, Droplet>
-    where
-        S: AsRef<str> + Serialize + Display,
-        D: Serialize + Display,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn create<S, D>(name: S, region: S, size: S, image: D) -> DropletRequest<Create, Droplet>
+		where
+			S: AsRef<str> + Serialize + Display,
+			D: Serialize + Display {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT);
 
-        let mut req = Request::new(url);
-        req.set_body(json!({
-            "name": name,
-            "region": region,
-            "size": size,
-            "image": format!("{}", image),
-        }));
-        req
-    }
+		let mut req = Request::new(url);
+		req.set_body(json!({
+			"name": name,
+			"region": region,
+			"size": size,
+			"image": format!("{}", image),
+		}));
+		req
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-multiple-droplets)
-    pub fn create_multiple<S, D>(
-        names: Vec<S>,
-        region: S,
-        size: S,
-        image: D,
-    ) -> DropletRequest<Create, Vec<Droplet>>
-    where
-        S: AsRef<str> + Serialize + Display,
-        D: Serialize + Display,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-multiple-droplets)
+	pub fn create_multiple<S, D>(
+		names: Vec<S>,
+		region: S,
+		size: S,
+		image: D,
+	) -> DropletRequest<Create, Vec<Droplet>>
+		where
+			S: AsRef<str> + Serialize + Display,
+			D: Serialize + Display {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT);
 
-        let mut req = Request::new(url);
-        req.set_body(json!({
-            "names": names,
-            "region": region,
-            "size": size,
-            "image": format!("{}", image),
-        }));
-        req
-    }
+		let mut req = Request::new(url);
+		req.set_body(json!({
+			"names": names,
+			"region": region,
+			"size": size,
+			"image": format!("{}", image),
+		}));
+		req
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-droplet-by-id)
-    pub fn get(id: usize) -> DropletRequest<Get, Droplet> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT)
-            .push(&id.to_string());
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-droplet-by-id)
+	pub fn get(id: usize) -> DropletRequest<Get, Droplet> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT)
+			.push(&id.to_string());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-droplets)
-    pub fn list() -> DropletRequest<List, Vec<Droplet>> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-droplets)
+	pub fn list() -> DropletRequest<List, Vec<Droplet>> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT);
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#listing-droplets-by-tag)
-    pub fn list_by_tag<S>(name: S) -> DropletRequest<List, Vec<Droplet>>
-    where
-        S: AsRef<str> + Serialize,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#listing-droplets-by-tag)
+	pub fn list_by_tag<S: AsRef<str> + Serialize>(name: S) -> DropletRequest<List, Vec<Droplet>> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT);
 
-        url.query_pairs_mut().append_pair("tag_name", name.as_ref());
+		url.query_pairs_mut().append_pair("tag_name", name.as_ref());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#delete-a-droplet)
-    pub fn delete(id: usize) -> DropletRequest<Delete, ()> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT)
-            .push(&id.to_string());
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#delete-a-droplet)
+	pub fn delete(id: usize) -> DropletRequest<Delete, ()> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT)
+			.push(&id.to_string());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#deleting-droplets-by-tag)
-    pub fn delete_by_tag<S>(name: S) -> DropletRequest<Delete, ()>
-    where
-        S: AsRef<str> + Serialize,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DROPLETS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#deleting-droplets-by-tag)
+	pub fn delete_by_tag<S: AsRef<str> + Serialize>(name: S) -> DropletRequest<Delete, ()> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DROPLETS_SEGMENT);
 
-        url.query_pairs_mut().append_pair("tag_name", name.as_ref());
+		url.query_pairs_mut().append_pair("tag_name", name.as_ref());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-droplet-neighbors)
-    pub fn neighbors() -> DropletRequest<Get, Vec<Vec<Droplet>>> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(REPORTS_SEGMENT)
-            .push(DROPLET_NEIGHBORS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-droplet-neighbors)
+	pub fn neighbors() -> DropletRequest<Get, Vec<Vec<Droplet>>> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(REPORTS_SEGMENT)
+			.push(DROPLET_NEIGHBORS_SEGMENT);
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 }
 
 impl DropletRequest<Create, Droplet> {
-    /// An array containing the IDs or fingerprints of the SSH keys that you
-    /// wish to embed in the Droplet's root account upon creation.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn ssh_keys<D>(mut self, val: Vec<D>) -> Self
-    where
-        D: Display + Serialize,
-    {
-        self.body_mut()["ssh_keys"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether automated backups should be enabled for
-    /// the Droplet. Automated backups can only be enabled when the Droplet is
-    /// created.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn backups(mut self, val: bool) -> Self {
-        self.body_mut()["backups"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether IPv6 is enabled on the Droplet.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn ipv6(mut self, val: bool) -> Self {
-        self.body_mut()["ipv6"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether private networking is enabled for the
-    /// Droplet. Private networking is currently only available in certain
-    /// regions.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn private_networking(mut self, val: bool) -> Self {
-        self.body_mut()["private_networking"] = json!(val);
-        self
-    }
-    /// A string containing 'user data' which may be used to configure the
-    /// Droplet on first boot, often a 'cloud-config' file or Bash script.
-    /// It must be plain text and may not exceed 64 KiB in size.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn user_data(mut self, val: bool) -> Self {
-        self.body_mut()["user_data"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether to install the DigitalOcean agent
-    /// for monitoring.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn monitoring(mut self, val: bool) -> Self {
-        self.body_mut()["monitoring"] = json!(val);
-        self
-    }
-    /// A flat array including the unique string identifier for each Block
-    /// Storage volume to be attached to the Droplet. At the moment a volume
-    /// can only be attached to a single Droplet.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn volumes(mut self, val: Vec<String>) -> Self {
-        self.body_mut()["volumes"] = json!(val);
-        self
-    }
-    /// A flat array of tag names as strings to apply to the Droplet after it
-    /// is created. Tag names can either be existing or new tags.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn tags(mut self, val: Vec<String>) -> Self {
-        self.body_mut()["tags"] = json!(val);
-        self
-    }
+	/// An array containing the IDs or fingerprints of the SSH keys that you
+	/// wish to embed in the Droplet's root account upon creation.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn ssh_keys<D>(mut self, val: Vec<D>) -> Self
+		where
+			D: Display + Serialize,
+	{
+		self.body_mut()["ssh_keys"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether automated backups should be enabled for
+	/// the Droplet. Automated backups can only be enabled when the Droplet is
+	/// created.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn backups(mut self, val: bool) -> Self {
+		self.body_mut()["backups"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether IPv6 is enabled on the Droplet.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn ipv6(mut self, val: bool) -> Self {
+		self.body_mut()["ipv6"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether private networking is enabled for the
+	/// Droplet. Private networking is currently only available in certain
+	/// regions.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn private_networking(mut self, val: bool) -> Self {
+		self.body_mut()["private_networking"] = json!(val);
+		self
+	}
+
+	/// A string containing 'user data' which may be used to configure the
+	/// Droplet on first boot, often a 'cloud-config' file or Bash script.
+	/// It must be plain text and may not exceed 64 KiB in size.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn user_data(mut self, val: bool) -> Self {
+		self.body_mut()["user_data"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether to install the DigitalOcean agent
+	/// for monitoring.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn monitoring(mut self, val: bool) -> Self {
+		self.body_mut()["monitoring"] = json!(val);
+		self
+	}
+
+	/// A flat array including the unique string identifier for each Block
+	/// Storage volume to be attached to the Droplet. At the moment a volume
+	/// can only be attached to a single Droplet.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn volumes(mut self, val: Vec<String>) -> Self {
+		self.body_mut()["volumes"] = json!(val);
+		self
+	}
+
+	/// A flat array of tag names as strings to apply to the Droplet after it
+	/// is created. Tag names can either be existing or new tags.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn tags(mut self, val: Vec<String>) -> Self {
+		self.body_mut()["tags"] = json!(val);
+		self
+	}
 }
 
 impl DropletRequest<Create, Vec<Droplet>> {
-    /// An array containing the IDs or fingerprints of the SSH keys that you
-    /// wish to embed in the Droplet's root account upon creation.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn ssh_keys<D>(mut self, val: Vec<D>) -> Self
-    where
-        D: Display + Serialize,
-    {
-        self.body_mut()["ssh_keys"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether automated backups should be enabled for
-    /// the Droplet. Automated backups can only be enabled when the Droplet is
-    /// created.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn backups(mut self, val: bool) -> Self {
-        self.body_mut()["backups"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether IPv6 is enabled on the Droplet.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn ipv6(mut self, val: bool) -> Self {
-        self.body_mut()["ipv6"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether private networking is enabled for the
-    /// Droplet. Private networking is currently only available in certain
-    /// regions.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn private_networking(mut self, val: bool) -> Self {
-        self.body_mut()["private_networking"] = json!(val);
-        self
-    }
-    /// A string containing 'user data' which may be used to configure the
-    /// Droplet on first boot, often a 'cloud-config' file or Bash script.
-    /// It must be plain text and may not exceed 64 KiB in size.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn user_data(mut self, val: bool) -> Self {
-        self.body_mut()["user_data"] = json!(val);
-        self
-    }
-    /// A boolean indicating whether to install the DigitalOcean agent
-    /// for monitoring.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn monitoring(mut self, val: bool) -> Self {
-        self.body_mut()["monitoring"] = json!(val);
-        self
-    }
-    /// A flat array including the unique string identifier for each Block
-    /// Storage volume to be attached to the Droplet. At the moment a volume
-    /// can only be attached to a single Droplet.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn volumes(mut self, val: Vec<String>) -> Self {
-        self.body_mut()["volumes"] = json!(val);
-        self
-    }
-    /// A flat array of tag names as strings to apply to the Droplet after it
-    /// is created. Tag names can either be existing or new tags.
-    ///
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
-    pub fn tags(mut self, val: Vec<String>) -> Self {
-        self.body_mut()["tags"] = json!(val);
-        self
-    }
+	/// An array containing the IDs or fingerprints of the SSH keys that you
+	/// wish to embed in the Droplet's root account upon creation.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn ssh_keys<D>(mut self, val: Vec<D>) -> Self
+		where
+			D: Display + Serialize,
+	{
+		self.body_mut()["ssh_keys"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether automated backups should be enabled for
+	/// the Droplet. Automated backups can only be enabled when the Droplet is
+	/// created.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn backups(mut self, val: bool) -> Self {
+		self.body_mut()["backups"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether IPv6 is enabled on the Droplet.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn ipv6(mut self, val: bool) -> Self {
+		self.body_mut()["ipv6"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether private networking is enabled for the
+	/// Droplet. Private networking is currently only available in certain
+	/// regions.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn private_networking(mut self, val: bool) -> Self {
+		self.body_mut()["private_networking"] = json!(val);
+		self
+	}
+
+	/// A string containing 'user data' which may be used to configure the
+	/// Droplet on first boot, often a 'cloud-config' file or Bash script.
+	/// It must be plain text and may not exceed 64 KiB in size.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn user_data(mut self, val: bool) -> Self {
+		self.body_mut()["user_data"] = json!(val);
+		self
+	}
+
+	/// A boolean indicating whether to install the DigitalOcean agent
+	/// for monitoring.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn monitoring(mut self, val: bool) -> Self {
+		self.body_mut()["monitoring"] = json!(val);
+		self
+	}
+
+	/// A flat array including the unique string identifier for each Block
+	/// Storage volume to be attached to the Droplet. At the moment a volume
+	/// can only be attached to a single Droplet.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn volumes(mut self, val: Vec<String>) -> Self {
+		self.body_mut()["volumes"] = json!(val);
+		self
+	}
+
+	/// A flat array of tag names as strings to apply to the Droplet after it
+	/// is created. Tag names can either be existing or new tags.
+	///
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-droplet)
+	pub fn tags(mut self, val: Vec<String>) -> Self {
+		self.body_mut()["tags"] = json!(val);
+		self
+	}
 }
 
 impl DropletRequest<Get, Droplet> {
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-snapshots-for-a-droplet)
-    pub fn snapshots(mut self) -> SnapshotRequest<List, Vec<Snapshot>> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(SNAPSHOTS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-snapshots-for-a-droplet)
+	pub fn snapshots(mut self) -> SnapshotRequest<List, Vec<Snapshot>> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(SNAPSHOTS_SEGMENT);
 
-        self.transmute()
-    }
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-backups-for-a-droplet)
-    pub fn backups(mut self) -> SnapshotRequest<List, Vec<Snapshot>> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(BACKUPS_SEGMENT);
+		self.transmute()
+	}
 
-        self.transmute()
-    }
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet)
-    pub fn neighbors(mut self) -> DropletRequest<List, Vec<Droplet>> {
-        self.url_mut()
-            .path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(NEIGHBORS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-backups-for-a-droplet)
+	pub fn backups(mut self) -> SnapshotRequest<List, Vec<Snapshot>> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(BACKUPS_SEGMENT);
 
-        self.transmute()
-    }
+		self.transmute()
+	}
+
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet)
+	pub fn neighbors(mut self) -> DropletRequest<List, Vec<Droplet>> {
+		self.url_mut()
+			.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(NEIGHBORS_SEGMENT);
+
+		self.transmute()
+	}
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DropletResponse {
-    droplet: Droplet,
+	droplet: Droplet
 }
 
 impl HasResponse for Droplet {
-    type Response = DropletResponse;
+	type Response = DropletResponse;
 }
 
 impl HasValue for DropletResponse {
-    type Value = Droplet;
-    fn value(self) -> Droplet {
-        self.droplet
-    }
+	type Value = Droplet;
+
+	fn value(self) -> Droplet {
+		self.droplet
+	}
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DropletListResponse {
-    droplets: Vec<Droplet>,
-    links: ApiLinks,
-    meta: ApiMeta,
+	droplets: Vec<Droplet>,
+	links: ApiLinks,
+	meta: ApiMeta
 }
 
 impl HasResponse for Vec<Droplet> {
-    type Response = DropletListResponse;
+	type Response = DropletListResponse;
 }
 
 impl HasPagination for DropletListResponse {
-    fn next_page(&self) -> Option<Url> {
-        self.links.next()
-    }
+	fn next_page(&self) -> Option<Url> {
+		self.links.next()
+	}
 }
 
 impl HasValue for DropletListResponse {
-    type Value = Vec<Droplet>;
-    fn value(self) -> Vec<Droplet> {
-        self.droplets
-    }
+	type Value = Vec<Droplet>;
+
+	fn value(self) -> Vec<Droplet> {
+		self.droplets
+	}
 }
 
 /// Response type returned from Digital Ocean
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DropletNeighborsResponse {
-    neighbors: Vec<Vec<Droplet>>,
+	neighbors: Vec<Vec<Droplet>>
 }
 
 impl HasResponse for Vec<Vec<Droplet>> {
-    type Response = DropletNeighborsResponse;
+	type Response = DropletNeighborsResponse;
 }
 
 impl HasValue for DropletNeighborsResponse {
-    type Value = Vec<Vec<Droplet>>;
-    fn value(self) -> Vec<Vec<Droplet>> {
-        self.neighbors
-    }
+	type Value = Vec<Vec<Droplet>>;
+
+	fn value(self) -> Vec<Vec<Droplet>> {
+		self.neighbors
+	}
 }

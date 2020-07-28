@@ -19,118 +19,114 @@ const DOMAINS_SEGMENT: &str = "domains";
 #[derive(Deserialize, Serialize, Debug, Clone, Getters, Setters)]
 #[get = "pub"]
 pub struct Domain {
-    /// The name of the domain itself. This should follow the standard domain
-    /// format of domain.TLD. For instance, example.com is a valid domain name.
-    name: String,
-    /// This value is the time to live for the records on this domain, in
+	/// The name of the domain itself. This should follow the standard domain
+	/// format of domain.TLD. For instance, example.com is a valid domain name.
+	name: String,
+
+	/// This value is the time to live for the records on this domain, in
     /// seconds. This defines the time frame that clients can cache queried
     /// information before a refresh should be requested.
-    ttl: Option<usize>,
-    /// This attribute contains the complete contents of the zone file for the
+	ttl: Option<usize>,
+
+	/// This attribute contains the complete contents of the zone file for the
     /// selected domain. Individual domain record resources should be used to
     /// get more granular control over records. However, this attribute can
     /// also be used to get information about the SOA record, which is created
     /// automatically and is not accessible as an individual record resource.
-    zone_file: Option<String>,
+	zone_file: Option<String>
 }
 
 impl Domain {
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-domain)
-    pub fn create<N, I>(name: N, ip_address: I) -> DomainRequest<Create, Domain>
-    where
-        N: AsRef<str> + Serialize + Display,
-        I: Into<IpAddr> + Serialize + Display,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DOMAINS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#create-a-new-domain)
+	pub fn create<N, I>(name: N, ip_address: I) -> DomainRequest<Create, Domain>
+		where N: AsRef<str> + Serialize + Display,
+		      I: Into<IpAddr> + Serialize + Display {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DOMAINS_SEGMENT);
 
-        let mut req = Request::new(url);
-        req.set_body(json!({
+		let mut req = Request::new(url);
+		req.set_body(json!({
             "name": name,
             "ip_address": ip_address,
         }));
-        req
-    }
+		req
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-domains)
-    pub fn list() -> DomainRequest<List, Vec<Domain>> {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DOMAINS_SEGMENT);
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#list-all-domains)
+	pub fn list() -> DomainRequest<List, Vec<Domain>> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DOMAINS_SEGMENT);
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-domain)
-    pub fn get<N>(name: N) -> DomainRequest<Get, Domain>
-    where
-        N: AsRef<str> + Display,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DOMAINS_SEGMENT)
-            .push(name.as_ref());
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-domain)
+	pub fn get<N: AsRef<str> + Display>(name: N) -> DomainRequest<Get, Domain> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DOMAINS_SEGMENT)
+			.push(name.as_ref());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 
-    /// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#delete-a-domain)
-    pub fn delete<N>(name: N) -> DomainRequest<Delete, ()>
-    where
-        N: AsRef<str> + Display,
-    {
-        let mut url = ROOT_URL.clone();
-        url.path_segments_mut()
-            .expect(STATIC_URL_ERROR)
-            .push(DOMAINS_SEGMENT)
-            .push(name.as_ref());
+	/// [Digital Ocean Documentation.](https://developers.digitalocean.com/documentation/v2/#delete-a-domain)
+	pub fn delete<N: AsRef<str> + Display>(name: N) -> DomainRequest<Delete, ()> {
+		let mut url = ROOT_URL.clone();
+		url.path_segments_mut()
+			.expect(STATIC_URL_ERROR)
+			.push(DOMAINS_SEGMENT)
+			.push(name.as_ref());
 
-        Request::new(url)
-    }
+		Request::new(url)
+	}
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DomainResponse {
-    domain: Domain,
+	domain: Domain
 }
 
 impl HasResponse for Domain {
-    type Response = DomainResponse;
+	type Response = DomainResponse;
 }
 
 impl HasValue for DomainResponse {
-    type Value = Domain;
-    fn value(self) -> Domain {
-        self.domain
-    }
+	type Value = Domain;
+
+	fn value(self) -> Domain {
+		self.domain
+	}
 }
 
 /// Response type returned from Digital Ocean.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DomainListResponse {
-    domains: Vec<Domain>,
-    links: ApiLinks,
-    meta: ApiMeta,
+	domains: Vec<Domain>,
+	links: ApiLinks,
+	meta: ApiMeta
 }
 
 impl HasResponse for Vec<Domain> {
-    type Response = DomainListResponse;
+	type Response = DomainListResponse;
 }
 
 impl HasPagination for DomainListResponse {
-    fn next_page(&self) -> Option<Url> {
-        self.links.next()
-    }
+	fn next_page(&self) -> Option<Url> {
+		self.links.next()
+	}
 }
 
 impl HasValue for DomainListResponse {
-    type Value = Vec<Domain>;
-    fn value(self) -> Vec<Domain> {
-        self.domains
-    }
+	type Value = Vec<Domain>;
+
+	fn value(self) -> Vec<Domain> {
+		self.domains
+	}
 }
