@@ -14,7 +14,6 @@ license = "MIT"
 readme = "README.md"
 
 [badges]
-travis-ci = { repository = "hoverbear/digitalocean" }
 maintenance = { status = "experimental" }
 
 [features]
