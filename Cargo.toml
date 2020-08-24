@@ -1,0 +1,24 @@
+[package]
+name = "digitalocean"
+version = "1.0.0"
+authors = ["Logan Darklock <logandarklock@gmail.com>"]
+repository = "https://github.com/LoganDark/digitalocean"
+categories = ["development-tools", "api-bindings"]
+homepage = "https://github.com/LoganDark/digitalocean"
+documentation = "https://docs.rs/crate/digitalocean/"
+description = "A pure Rust library for interfacing with DigitalOcean's API"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["hyper"]
+
+[dependencies]
+thiserror = "1.0.20"
+anyhow = "1.0.32"
+async-trait = "0.1.36"
+log = "0.4.11"
+tokio = { version = "0.2.22", features = ["full"] }
+
+hyper = { version = "0.13.7", optional = true }
