@@ -132,7 +132,8 @@ pub mod droplet_fields {
 	/// These exist in the `networks` field of a droplet.
 	#[derive(Deserialize, Serialize, Debug, Clone)]
 	pub struct NetworkV4 {
-		pub gateway: Ipv4Addr,
+	    /// *Note:* Gateway is a String rather than Ipv4Addr as a workaround until time permits to correctly parse this field.
+		pub gateway: String,
 		pub ip_address: Ipv4Addr,
 		pub netmask: Ipv4Addr,
 		/// *Note:* Since `type` is a keyword in Rust `kind` is used instead.
