@@ -1,5 +1,7 @@
 # DigitalOcean
 
+> Sorry, but I had a falling out with Hoverbear (the original maintainer of this crate) and I'm also unable to maintain this crate - I'm currently on a huge project and likely will be for a while. I think the best thing for this crate would be for them to remove the notice from their repository, as it didn't really work out.
+
 [![Build Status](https://travis-ci.org/Hoverbear/digitalocean.svg?branch=master)](https://travis-ci.org/Hoverbear/digitalocean)
 [![Crates.io](https://img.shields.io/crates/v/digitalocean.svg)](https://crates.io/crates/digitalocean)
 
